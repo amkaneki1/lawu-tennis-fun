@@ -2,27 +2,31 @@
 // This script populates the summary information on the home page for bookings and waiting list.
 
 document.addEventListener('DOMContentLoaded', () => {
+  const currentUser = requireLogin();
+  if (!currentUser) return;
   const bookingsSummaryEl = document.getElementById('bookingsSummary');
-  const waitingSummaryEl = null;
   const promosSummaryEl = document.getElementById('promosSummary');
-
-  // Retrieve bookings from localStorage; stored as an object keyed by date with array of session ids.
+  // Retrieve bookings from localStorage; stored as an object keyed by date with array of session objects
   const bookingsData = JSON.parse(localStorage.getItem('lawuTennisBookings')) || {};
   let bookingCount = 0;
   Object.keys(bookingsData).forEach(date => {
     const arr = bookingsData[date];
-    if (Array.isArray(arr)) bookingCount += arr.length;
+    if (Array.isArray(arr)) {
+      arr.forEach(item => {
+        if (typeof item === 'string') {
+          bookingCount++;
+        } else {
+          if (!item.userEmail || item.userEmail === currentUser) bookingCount++;
+        }
+      });
+    }
   });
   if (bookingCount > 0) {
     bookingsSummaryEl.textContent = `You have ${bookingCount} upcoming booking${bookingCount > 1 ? 's' : ''}.`;
   } else {
     bookingsSummaryEl.textContent = 'No booking data available right now…';
   }
-
-  // Retrieve waiting list from localStorage; stored as array of session objects.
-  // We no longer display waiting list information on the home page for customer POV
-
-  // Retrieve promotions; for now promotions are static or stored under lawuTennisPromos. Each promotion is an object.
+  // Retrieve promotions; for now promotions are static or stored under lawuTennisPromos.
   const promosData = JSON.parse(localStorage.getItem('lawuTennisPromos')) || [];
   if (promosData.length > 0) {
     promosSummaryEl.textContent = `We have ${promosData.length} promotion${promosData.length > 1 ? 's' : ''} available.`;

@@ -81,8 +81,17 @@ function renderSchedule(dateStr) {
   html += '<div class="session-list">';
   // Retrieve existing bookings to determine initial button states
   const bookingsData = JSON.parse(localStorage.getItem('lawuTennisBookings')) || {};
+  const currentUser = localStorage.getItem('lawuTennisCurrentUser');
   sessions.forEach((sess, index) => {
-    const isBooked = (bookingsData[dateStr] || []).some(item => item.time === sess.time && item.title === sess.title);
+    // Determine if the current user has already booked this session on this date
+    const dateBookings = bookingsData[dateStr] || [];
+    const isBooked = dateBookings.some(item => {
+      // Support older objects without userEmail property by assuming they belong to current user
+      if (typeof item === 'string') {
+        return item === sess.time && !currentUser; // Should not happen
+      }
+      return item.time === sess.time && item.title === sess.title && (item.userEmail ? item.userEmail === currentUser : true);
+    });
     // Regardless of the number of spots, from customer perspective all sessions are available to book
     const spotsLabel = 'Available';
     let buttonHTML = '';
@@ -132,7 +141,6 @@ function initSchedule() {
   const datePicker = document.getElementById('datePicker');
   const prevDayBtn = document.getElementById('prevDay');
   const nextDayBtn = document.getElementById('nextDay');
-  const resetBtn = document.getElementById('resetBtn');
   const today = new Date();
   const todayStr = formatDate(today);
   datePicker.value = todayStr;
@@ -155,13 +163,11 @@ function initSchedule() {
     datePicker.value = newDateStr;
     renderSchedule(newDateStr);
   });
-  resetBtn.addEventListener('click', () => {
-    if (confirm('This will delete all bookings and waiting list entries. Are you sure?')) {
-      localStorage.removeItem('lawuTennisBookings');
-      localStorage.removeItem('lawuTennisWaitingList');
-      renderSchedule(datePicker.value);
-    }
-  });
 }
 
-document.addEventListener('DOMContentLoaded', initSchedule);
+// Ensure user is logged in before initializing schedule
+document.addEventListener('DOMContentLoaded', () => {
+  const user = requireLogin();
+  if (!user) return;
+  initSchedule();
+});

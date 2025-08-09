@@ -367,6 +367,49 @@ body {
   font-size: 0.9rem;
 }
 
+/* Authentication pages (login, signup, reset) */
+.auth-card {
+  max-width: 400px;
+  width: 100%;
+  margin: 40px auto;
+  padding: 30px 20px 40px;
+}
+.auth-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #3a614d;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.auth-form label {
+  font-size: 0.9rem;
+  color: #3a614d;
+}
+.auth-form input {
+  padding: 8px 10px;
+  border: 1px solid #d7cdbf;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+.auth-note {
+  font-size: 0.85rem;
+  margin-top: 12px;
+  text-align: center;
+}
+.auth-note a {
+  color: #3a614d;
+  text-decoration: none;
+  font-weight: 600;
+}
+.auth-note a:hover {
+  text-decoration: underline;
+}
+
 /* Class detail page styling */
 .detail-list p {
   margin: 6px 0;

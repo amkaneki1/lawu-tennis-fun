@@ -7,6 +7,8 @@ function getQueryParam(param) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const currentUser = requireLogin();
+  if (!currentUser) return;
   const name = decodeURIComponent(getQueryParam('name') || '');
   const titleEl = document.getElementById('packageTitle');
   const contentEl = document.getElementById('packageContent');
@@ -50,7 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
   `;
   // Check if already purchased
   const purchased = JSON.parse(localStorage.getItem('lawuTennisPurchasedPackages')) || [];
-  const alreadyPurchased = purchased.some(pkg => pkg.name === name);
+  // Check if current user already purchased this package
+  const alreadyPurchased = purchased.some(pkg => pkg.name === name && (!pkg.userEmail || pkg.userEmail === currentUser));
   if (alreadyPurchased) {
     messageEl.textContent = 'You have already purchased this package.';
     messageSection.style.display = 'block';
@@ -59,11 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
     checkoutSection.style.display = 'block';
     messageSection.style.display = 'none';
     checkoutBtn.addEventListener('click', () => {
-      // Purchase the package
+      // Purchase the package for the current user
       const current = JSON.parse(localStorage.getItem('lawuTennisPurchasedPackages')) || [];
-      current.push({ name, expiry: details.expiry });
+      current.push({ name, expiry: details.expiry, userEmail: currentUser });
       localStorage.setItem('lawuTennisPurchasedPackages', JSON.stringify(current));
-      // Create a transaction entry to simulate pending payment like Flou Pilates
+      // Create a transaction entry to simulate pending payment
       const transactions = JSON.parse(localStorage.getItem('lawuTennisTransactions')) || [];
       const transactionId = 'TX' + Date.now();
       const now = new Date();
@@ -74,7 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
         item: name,
         price: details.price,
         status: 'Pending Payment',
-        due: dueDate.toISOString()
+        due: dueDate.toISOString(),
+        type: 'package',
+        userEmail: currentUser
       });
       localStorage.setItem('lawuTennisTransactions', JSON.stringify(transactions));
       // Show message and hide checkout button

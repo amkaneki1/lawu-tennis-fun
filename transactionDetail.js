@@ -7,11 +7,14 @@ function getQueryParam(param) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const currentUser = requireLogin();
+  if (!currentUser) return;
   const detailEl = document.getElementById('transactionDetail');
   const id = decodeURIComponent(getQueryParam('id') || '');
   const transactions = JSON.parse(localStorage.getItem('lawuTennisTransactions')) || [];
   const tx = transactions.find(t => t.id === id);
-  if (!tx) {
+  // Ensure the transaction belongs to current user (or no user specified)
+  if (!tx || (tx.userEmail && tx.userEmail !== currentUser)) {
     detailEl.innerHTML = '<p class="message">Transaction not found.</p>';
     return;
   }
@@ -31,7 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const html = document.createElement('div');
   html.className = 'transaction-detail-card';
+  // Retrieve user profile for displaying name
+  const profileData = JSON.parse(localStorage.getItem('lawuTennisProfile')) || {};
+  const userName = profileData.fullName || 'Guest User';
   html.innerHTML = `
+    <p><strong>Name:</strong> ${userName}</p>
     <p><strong>Invoice ID:</strong> ${tx.id}</p>
     <p><strong>Date:</strong> ${tx.date}</p>
     <p><strong>Item:</strong> ${tx.item}</p>
@@ -43,13 +50,36 @@ document.addEventListener('DOMContentLoaded', () => {
     <p>Bank Transfer (Mandiri) a/n Lawu Tennis Fun</p>
     <p>Account Number: 1234567890</p>
   `;
-  // Upload button
+  // Upload button for payment proof
+  const uploadLabel = document.createElement('label');
+  uploadLabel.textContent = 'Upload Payment Proof:';
+  uploadLabel.style.display = 'block';
+  uploadLabel.style.marginTop = '12px';
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*,application/pdf';
+  fileInput.style.marginBottom = '8px';
   const uploadBtn = document.createElement('button');
   uploadBtn.className = 'btn';
-  uploadBtn.textContent = 'Upload Payment Proof';
+  uploadBtn.textContent = 'Submit Proof';
   uploadBtn.addEventListener('click', () => {
-    alert('Payment proof upload is not implemented in this demo.');
+    if (fileInput.files.length === 0) {
+      alert('Please select a file to upload as proof of payment.');
+      return;
+    }
+    // In this demo we simply mark the transaction as completed
+    const transactions = JSON.parse(localStorage.getItem('lawuTennisTransactions')) || [];
+    const index = transactions.findIndex(t => t.id === tx.id);
+    if (index >= 0) {
+      transactions[index].status = 'Completed';
+      localStorage.setItem('lawuTennisTransactions', JSON.stringify(transactions));
+    }
+    alert('Payment proof submitted successfully! Thank you.');
+    // After uploading, redirect back to transactions page
+    window.location.href = 'transactions.html';
   });
+  html.appendChild(uploadLabel);
+  html.appendChild(fileInput);
   html.appendChild(uploadBtn);
   detailEl.appendChild(html);
 

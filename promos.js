@@ -4,6 +4,8 @@
 // default demo promotions for first-time visitors.
 
 document.addEventListener('DOMContentLoaded', () => {
+  const currentUser = requireLogin();
+  if (!currentUser) return;
   // Default promo data used if none exists in localStorage
   const defaultPromos = [
     {

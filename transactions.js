@@ -2,6 +2,8 @@
 // Handles display of user transactions and tab switching between Pending and Completed.
 
 document.addEventListener('DOMContentLoaded', () => {
+  const currentUser = requireLogin();
+  if (!currentUser) return;
   const pendingTab = document.getElementById('pendingTab');
   const completedTab = document.getElementById('completedTab');
   const listEl = document.getElementById('transactionList');
@@ -10,8 +12,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderTransactions() {
     listEl.innerHTML = '';
     const transactions = JSON.parse(localStorage.getItem('lawuTennisTransactions')) || [];
-    // Filter by status
+    // Filter by status and by user
     const filtered = transactions.filter(tx => {
+      if (tx.userEmail && tx.userEmail !== currentUser) {
+        return false;
+      }
       if (currentTab === 'Pending') return tx.status === 'Pending Payment';
       return tx.status !== 'Pending Payment';
     });

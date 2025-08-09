@@ -2,22 +2,20 @@
 // Loads user information and handles logout on the profile page.
 
 document.addEventListener('DOMContentLoaded', () => {
+  const currentUser = requireLogin();
+  if (!currentUser) return;
   const profileData = JSON.parse(localStorage.getItem('lawuTennisProfile')) || {};
   const nameEl = document.getElementById('profileName');
   const emailEl = document.getElementById('profileEmail');
-  nameEl.textContent = profileData.fullName || 'Guest User';
-  emailEl.textContent = profileData.email || 'guest@example.com';
+  nameEl.textContent = profileData.fullName || currentUser;
+  emailEl.textContent = profileData.email || currentUser;
 
   const logoutBtn = document.getElementById('logoutButton');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-      // Clear profile, bookings, waiting list and packages from storage
-      localStorage.removeItem('lawuTennisProfile');
-      localStorage.removeItem('lawuTennisBookings');
-      localStorage.removeItem('lawuTennisWaitingList');
-      localStorage.removeItem('lawuTennisPurchasedPackages');
+      logoutUser();
       alert('You have been logged out.');
-      window.location.href = 'index.html';
+      window.location.href = 'login.html';
     });
   }
 });

@@ -2,6 +2,8 @@
 // Handles display of a single class and booking/waitlist actions.
 
 document.addEventListener('DOMContentLoaded', () => {
+  const currentUser = requireLogin();
+  if (!currentUser) return;
   const classInfoEl = document.getElementById('classInfo');
   const classActionsEl = document.getElementById('classActions');
   const titleEl = document.getElementById('classTitle');
@@ -31,11 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
   `;
   classInfoEl.appendChild(infoList);
 
-  // Determine booking status from localStorage
+  // Determine booking status from localStorage for current user
   const bookingsData = JSON.parse(localStorage.getItem('lawuTennisBookings')) || {};
   let isBooked = false;
   if (bookingsData[session.date]) {
-    isBooked = bookingsData[session.date].some(b => b.time === session.time && b.title === session.title);
+    isBooked = bookingsData[session.date].some(b => {
+      if (typeof b === 'string') {
+        return b === session.time && !currentUser;
+      }
+      return b.time === session.time && b.title === session.title && (b.userEmail ? b.userEmail === currentUser : true);
+    });
   }
 
   // Input for promo code
@@ -73,17 +80,17 @@ document.addEventListener('DOMContentLoaded', () => {
   actionBtn.addEventListener('click', () => {
     // If not booked, perform booking and create transaction, then redirect
     if (!isBooked) {
-      // Add booking
+      // Add booking for current user
       const date = session.date;
-      const bookingObj = { time: session.time, title: session.title };
+      const bookingObj = { time: session.time, title: session.title, userEmail: currentUser };
       const data = JSON.parse(localStorage.getItem('lawuTennisBookings')) || {};
       if (!data[date]) data[date] = [];
-      // Avoid duplicates
-      if (!data[date].some(b => b.time === bookingObj.time && b.title === bookingObj.title)) {
+      // Avoid duplicates for this user
+      if (!data[date].some(b => b.time === bookingObj.time && b.title === bookingObj.title && (b.userEmail ? b.userEmail === currentUser : true))) {
         data[date].push(bookingObj);
         localStorage.setItem('lawuTennisBookings', JSON.stringify(data));
       }
-      // Create a transaction for this booking
+      // Create a transaction for this booking for current user
       const transactions = JSON.parse(localStorage.getItem('lawuTennisTransactions')) || [];
       const transactionId = 'TX' + Date.now();
       const now = new Date();
@@ -95,7 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
         price: session.price,
         status: 'Pending Payment',
         due: dueDate.toISOString(),
-        type: 'class'
+        type: 'class',
+        userEmail: currentUser
       });
       localStorage.setItem('lawuTennisTransactions', JSON.stringify(transactions));
       // Redirect to transaction detail page

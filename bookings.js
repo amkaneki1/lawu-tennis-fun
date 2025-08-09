@@ -1,6 +1,8 @@
 // Script to display a list of booked sessions stored in localStorage.
 
 document.addEventListener('DOMContentLoaded', () => {
+  const currentUser = requireLogin();
+  if (!currentUser) return;
   const bookingsList = document.getElementById('bookingsList');
   if (!bookingsList) return;
   // Retrieve stored bookings from localStorage; keys are dates and values are arrays of session objects
@@ -9,11 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Flatten the booking data into an array of objects for sorting and display.
   Object.keys(stored).forEach(date => {
     (stored[date] || []).forEach(session => {
-      // session may be a string if created by older version; handle gracefully
       if (typeof session === 'string') {
+        // For legacy entries, assume they belong to current user
         items.push({ date, time: session, title: '' });
       } else {
-        items.push({ date, time: session.time, title: session.title || '' });
+        if (!session.userEmail || session.userEmail === currentUser) {
+          items.push({ date, time: session.time, title: session.title || '' });
+        }
       }
     });
   });
