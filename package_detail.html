@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Packages - Lawu Tennis Fun</title>
+  <title>Package Detail - Lawu Tennis Fun</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,29 +12,17 @@
 <body class="beige-bg">
   <div class="main-card">
     <header class="inner-header">
-      <a href="index.html" class="back-link">← Back</a>
-      <h1>Packages</h1>
+      <a href="packages.html" class="back-link">← Back</a>
+      <h1 id="packageTitle">Package Detail</h1>
     </header>
-    <section class="section">
-      <h2>Membership Packages</h2>
-      <div class="card-list">
-        <!-- Package cards with buy buttons. Data attributes used by packages.js -->
-        <div class="card-item">
-          <h3>Single Session</h3>
-          <p>One practice session when you need a quick workout.</p>
-          <a href="package_detail.html?name=Single%20Session" class="btn package-link" data-name="Single Session" data-expiry="1 session">Buy</a>
-        </div>
-        <div class="card-item">
-          <h3>Weekly Plan</h3>
-          <p>Up to 3 sessions per week to keep you fit and sharp.</p>
-          <a href="package_detail.html?name=Weekly%20Plan" class="btn package-link" data-name="Weekly Plan" data-expiry="1 week">Buy</a>
-        </div>
-        <div class="card-item">
-          <h3>Monthly Membership</h3>
-          <p>Unlimited sessions for a month—perfect for serious players.</p>
-          <a href="package_detail.html?name=Monthly%20Membership" class="btn package-link" data-name="Monthly Membership" data-expiry="1 month">Buy</a>
-        </div>
-      </div>
+    <section class="section" id="packageContent">
+      <!-- package details inserted via script -->
+    </section>
+    <section class="section" id="checkoutSection" style="display:none;">
+      <button id="checkoutBtn" class="btn">Checkout</button>
+    </section>
+    <section class="section" id="messageSection" style="display:none;">
+      <p id="purchaseMessage" class="message"></p>
     </section>
   </div>
   <nav class="bottom-nav">
@@ -59,6 +47,6 @@
       <span class="nav-label">Profile</span>
     </a>
   </nav>
-  <script src="packages.js"></script>
+  <script src="packageDetail.js"></script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lawu Tennis Fun</title>
+  <title>Class Detail - Lawu Tennis Fun</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,35 +11,23 @@
 </head>
 <body class="beige-bg">
   <div class="main-card">
-    <header class="hero">
-      <h1 class="logo">LAWU</h1>
-      <span class="subtitle">Tennis Fun</span>
+    <header class="inner-header">
+      <a href="schedule.html" class="back-link">← Back</a>
+      <h1 id="classTitle">Class Detail</h1>
     </header>
-    <!-- Bookings summary section dynamically filled via script -->
-    <section class="section">
-      <div class="section-header">
-        <h2>Bookings</h2>
-        <a href="bookings.html" class="see-all">See All</a>
-      </div>
-      <p id="bookingsSummary" class="message">Loading bookings…</p>
-      <a href="schedule.html" class="btn">Browse Schedule</a>
+    <section id="classInfo" class="section">
+      <!-- Class information will be injected here -->
     </section>
-    <!-- Promotions summary section dynamically filled via script -->
-    <section class="section">
-      <div class="section-header">
-        <h2>Promos</h2>
-        <a href="promos.html" class="see-all">See All</a>
-      </div>
-      <p id="promosSummary" class="message">Loading promotions…</p>
+    <section id="classActions" class="section">
+      <!-- Action buttons will be injected here -->
     </section>
   </div>
   <nav class="bottom-nav">
-    <!-- Bottom navigation links replicate the menu found on floupilates.com.  -->
-    <a href="index.html" class="nav-item active">
+    <a href="index.html" class="nav-item">
       <span class="nav-icon">🏠</span>
       <span class="nav-label">Home</span>
     </a>
-    <a href="schedule.html" class="nav-item">
+    <a href="schedule.html" class="nav-item active">
       <span class="nav-icon">🎾</span>
       <span class="nav-label">Classes</span>
     </a>
@@ -56,6 +44,6 @@
       <span class="nav-label">Profile</span>
     </a>
   </nav>
-  <script src="home.js"></script>
+  <script src="classDetail.js"></script>
 </body>
 </html>

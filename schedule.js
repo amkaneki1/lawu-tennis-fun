@@ -1,18 +1,9 @@
-// Schedule functionality for Lawu Tennis Fun
-// This script manages the booking table, date navigation and persistence via localStorage.
+// schedule.js
+// This file implements a more flexible class schedule similar to the Flou Pilates site.
+// It shows a list of tennis sessions per date, allows booking available sessions,
+// and joining a waiting list for full sessions. All data is stored in localStorage.
 
-// Define time slots for the day (hourly from 07:00 to 21:00)
-const timeSlots = [];
-for (let hour = 7; hour <= 20; hour++) {
-  const nextHour = hour + 1;
-  const start = hour.toString().padStart(2, '0') + ':00';
-  const end = nextHour.toString().padStart(2, '0') + ':00';
-  timeSlots.push(`${start} - ${end}`);
-}
-
-// Storage key to separate from other demos
-const STORAGE_KEY = 'lawuTennisBookings';
-
+// Utility to format dates as YYYY-MM-DD
 function formatDate(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -20,63 +11,124 @@ function formatDate(date) {
   return `${year}-${month}-${day}`;
 }
 
-function loadBookings() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : {};
-}
-
-function saveBookings(bookings) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+// Generate sample sessions for demonstration purposes. In a real application this
+// data would come from a server.
+function getSessionsForDate(dateStr) {
+  // We'll return the same sessions regardless of date for simplicity.
+  return [
+    {
+      time: '07:00 - 08:00',
+      duration: '1h',
+      title: 'Morning Tennis Drills',
+      coach: 'Coach Andi',
+      instructor: 'Coach Andi',
+      location: 'Court 1',
+      spots: 4,
+      price: 'Rp 150.000',
+      description: 'Start your day with energizing drills focusing on footwork and consistency.'
+    },
+    {
+      time: '09:00 - 10:30',
+      duration: '1.5h',
+      title: 'Doubles Practice',
+      coach: 'Coach Budi',
+      instructor: 'Coach Budi',
+      location: 'Court 2',
+      spots: 0,
+      price: 'Rp 200.000',
+      description: 'Sharpen your teamwork and court strategies in this doubles-focused session.'
+    },
+    {
+      time: '11:00 - 12:00',
+      duration: '1h',
+      title: 'Serve & Return Workshop',
+      coach: 'Coach Citra',
+      instructor: 'Coach Citra',
+      location: 'Court 3',
+      spots: 2,
+      price: 'Rp 180.000',
+      description: 'Improve your serve accuracy and perfect your returns with targeted drills.'
+    },
+    {
+      time: '14:00 - 15:30',
+      duration: '1.5h',
+      title: 'Singles Strategy',
+      coach: 'Coach Dani',
+      instructor: 'Coach Dani',
+      location: 'Court 1',
+      spots: 0,
+      price: 'Rp 200.000',
+      description: 'Learn tactics and positioning to outsmart your opponent in singles play.'
+    },
+    {
+      time: '16:00 - 17:00',
+      duration: '1h',
+      title: 'Junior Tennis Fun',
+      coach: 'Coach Eka',
+      instructor: 'Coach Eka',
+      location: 'Court 2',
+      spots: 3,
+      price: 'Rp 120.000',
+      description: 'A fun, engaging class for young players to learn the basics of tennis.'
+    }
+  ];
 }
 
 function renderSchedule(dateStr) {
-  const scheduleContainer = document.getElementById('scheduleContainer');
-  const bookings = loadBookings();
-  const bookedSlots = bookings[dateStr] || [];
-  let html = `<h2>Schedule for ${dateStr}</h2>`;
-  html += '<table><thead><tr><th>Time Slot</th><th>Status</th></tr></thead><tbody>';
-  timeSlots.forEach(slot => {
-    const isBooked = bookedSlots.includes(slot);
-    const cellClass = isBooked ? 'booked' : 'available';
-    const status = isBooked ? 'Booked' : 'Available';
-    html += `<tr><td>${slot}</td><td class="${cellClass}" data-slot="${slot}">${status}</td></tr>`;
+  const container = document.getElementById('scheduleContainer');
+  const sessions = getSessionsForDate(dateStr);
+  let html = `<h2>Classes on ${dateStr}</h2>`;
+  html += '<div class="session-list">';
+  // Retrieve existing bookings to determine initial button states
+  const bookingsData = JSON.parse(localStorage.getItem('lawuTennisBookings')) || {};
+  sessions.forEach((sess, index) => {
+    const isBooked = (bookingsData[dateStr] || []).some(item => item.time === sess.time && item.title === sess.title);
+    // Regardless of the number of spots, from customer perspective all sessions are available to book
+    const spotsLabel = 'Available';
+    let buttonHTML = '';
+    if (isBooked) {
+      buttonHTML = `<button class="btn detail-btn" data-index="${index}" disabled>Booked</button>`;
+    } else {
+      buttonHTML = `<button class="btn detail-btn" data-index="${index}">Book</button>`;
+    }
+    html += `<div class="session-item" data-index="${index}">
+        <div class="session-time">${sess.time}</div>
+        <div class="session-details">
+          <h3>${sess.title}</h3>
+          <p>${sess.coach} — ${sess.location}</p>
+        </div>
+        <div class="session-actions">
+          <span class="spots">${spotsLabel}</span>
+          ${buttonHTML}
+        </div>
+      </div>`;
   });
-  html += '</tbody></table>';
-  scheduleContainer.innerHTML = html;
-  // Add listeners to available cells
-  scheduleContainer.querySelectorAll('td.available').forEach(cell => {
-    cell.addEventListener('click', () => {
-      let slot = cell.getAttribute('data-slot') || cell.parentElement.children[0].textContent.trim();
-      if (!bookedSlots.includes(slot)) {
-        bookedSlots.push(slot);
-        bookings[dateStr] = bookedSlots;
-        saveBookings(bookings);
-        renderSchedule(dateStr);
-      }
-    });
-  });
-  // Listeners to cancel booked cells
-  scheduleContainer.querySelectorAll('td.booked').forEach(cell => {
-    cell.addEventListener('click', () => {
-      let slot = cell.getAttribute('data-slot') || cell.parentElement.children[0].textContent.trim();
-      const index = bookedSlots.indexOf(slot);
-      if (index > -1) {
-        if (confirm(`Cancel booking for ${slot}?`)) {
-          bookedSlots.splice(index, 1);
-          if (bookedSlots.length === 0) {
-            delete bookings[dateStr];
-          } else {
-            bookings[dateStr] = bookedSlots;
-          }
-          saveBookings(bookings);
-          renderSchedule(dateStr);
-        }
-      }
+  html += '</div>';
+  container.innerHTML = html;
+  // Attach listeners for detail buttons
+  container.querySelectorAll('.detail-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = btn.getAttribute('data-index');
+      const sess = sessions[idx];
+      // Build session object for class detail page
+      const detailObj = {
+        date: dateStr,
+        time: sess.time,
+        duration: sess.duration || '',
+        title: sess.title,
+        instructor: sess.coach,
+        location: sess.location,
+        spots: sess.spots,
+        price: sess.price || 'Free',
+        description: sess.description || ''
+      };
+      sessionStorage.setItem('selectedClass', JSON.stringify(detailObj));
+      window.location.href = 'class_detail.html';
     });
   });
 }
 
-function init() {
+function initSchedule() {
   const datePicker = document.getElementById('datePicker');
   const prevDayBtn = document.getElementById('prevDay');
   const nextDayBtn = document.getElementById('nextDay');
@@ -104,10 +156,12 @@ function init() {
     renderSchedule(newDateStr);
   });
   resetBtn.addEventListener('click', () => {
-    if (confirm('This will delete all bookings. Are you sure?')) {
-      localStorage.removeItem(STORAGE_KEY);
+    if (confirm('This will delete all bookings and waiting list entries. Are you sure?')) {
+      localStorage.removeItem('lawuTennisBookings');
+      localStorage.removeItem('lawuTennisWaitingList');
       renderSchedule(datePicker.value);
     }
   });
 }
-document.addEventListener('DOMContentLoaded', init);
+
+document.addEventListener('DOMContentLoaded', initSchedule);

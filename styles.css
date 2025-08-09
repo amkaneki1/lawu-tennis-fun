@@ -270,3 +270,185 @@ body {
   font-size: 0.95rem;
   color: #3a614d;
 }
+
+/* Session list styling for schedule page */
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.session-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f5ef;
+  border: 1px solid #e0d8ce;
+  border-radius: 6px;
+  padding: 15px;
+}
+.session-time {
+  font-weight: 600;
+  color: #3a614d;
+  margin-right: 15px;
+}
+.session-details h3 {
+  margin-bottom: 4px;
+  font-size: 1rem;
+  color: #3a614d;
+}
+.session-details p {
+  font-size: 0.8rem;
+  color: #666;
+}
+.session-actions {
+  text-align: right;
+}
+.session-actions .spots {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+  color: #666;
+}
+.session-actions .spots.full {
+  color: #e57373;
+}
+.session-actions .btn {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+/* Promo card styling */
+.promo-card {
+  background-color: #f8f5ef;
+  border: 1px solid #e0d8ce;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+.promo-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+  color: #3a614d;
+}
+.promo-card p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+.promo-code {
+  font-weight: 600;
+  color: #b76e79;
+}
+
+/* Class detail promo container */
+.promo-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.promo-container label {
+  font-size: 0.9rem;
+  color: #3a614d;
+}
+.promo-container input {
+  flex-grow: 1;
+  padding: 6px;
+  border: 1px solid #d7cdbf;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* Success message styling */
+.message.success {
+  color: #3a8f3a;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+/* Class detail page styling */
+.detail-list p {
+  margin: 6px 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+.detail-list p strong {
+  color: #3a614d;
+}
+
+/* Transactions page */
+.tabs {
+  display: flex;
+  margin-bottom: 16px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  background-color: #f0ebe3;
+  border: 1px solid #d7cdbf;
+  border-bottom: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #3a614d;
+}
+.tab-btn.active {
+  background-color: #ffffff;
+  font-weight: 600;
+}
+.transaction-list {
+  border: 1px solid #d7cdbf;
+  border-radius: 0 0 6px 6px;
+  padding: 16px;
+  background-color: #fff;
+}
+.transaction-card {
+  border: 1px solid #e0d8ce;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background-color: #f8f5ef;
+}
+.transaction-card p {
+  margin: 4px 0;
+  font-size: 0.85rem;
+}
+.transaction-card a.btn {
+  margin-top: 8px;
+  display: inline-block;
+}
+
+/* Transaction detail page */
+.transaction-detail-card {
+  background-color: #f8f5ef;
+  border: 1px solid #e0d8ce;
+  border-radius: 6px;
+  padding: 16px;
+}
+.transaction-detail-card p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+.transaction-detail-card h3 {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-size: 1rem;
+  color: #3a614d;
+}
+
+/* Payment proof form */
+.payment-form label {
+  display: block;
+  margin: 8px 0 4px;
+  font-size: 0.9rem;
+  color: #3a614d;
+}
+.payment-form input[type="text"],
+.payment-form input[type="file"] {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #d7cdbf;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
