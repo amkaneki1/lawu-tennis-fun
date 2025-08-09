@@ -10,11 +10,19 @@ document.addEventListener('DOMContentLoaded', () => {
   nameEl.textContent = profileData.fullName || currentUser;
   emailEl.textContent = profileData.email || currentUser;
 
+  // Set avatar letter from name
+  const avatarEl = document.getElementById('profileAvatar');
+  if (avatarEl) {
+    const displayName = profileData.fullName || currentUser;
+    avatarEl.textContent = displayName.charAt(0).toUpperCase();
+  }
+
   // Show admin dashboard link if this user is an admin
   if (profileData.isAdmin) {
     const adminLinkItem = document.getElementById('adminPanelLink');
     if (adminLinkItem) {
-      adminLinkItem.style.display = 'list-item';
+      // Show as block in profile menu
+      adminLinkItem.style.display = 'flex';
     }
   }
 

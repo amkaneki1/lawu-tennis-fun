@@ -17,10 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (profileData.birthDate) {
     document.getElementById('birthDate').value = profileData.birthDate;
   }
-  if (profileData.gender) {
-    const radio = form.querySelector(`input[name="gender"][value="${profileData.gender}"]`);
-    if (radio) radio.checked = true;
-  }
+  // Gender field removed: no need to populate
   document.getElementById('notes').value = profileData.notes || '';
   form.addEventListener('submit', e => {
     e.preventDefault();
@@ -30,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
       phone: document.getElementById('phone').value,
       instagram: document.getElementById('instagram').value,
       birthDate: document.getElementById('birthDate').value,
-      gender: form.querySelector('input[name="gender"]:checked')?.value || '',
+      // Gender removed
       notes: document.getElementById('notes').value
     };
     // Save to global profiles

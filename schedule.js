@@ -28,7 +28,7 @@ function getSessionsForDate(dateStr) {
       title: 'Morning Tennis Drills',
       coach: 'Coach Andi',
       location: 'Court 1',
-      gender: 'All Gender',
+      // Gender removed (no longer used)
       maxSlots: 8,
       price: 150000
     });
@@ -107,7 +107,7 @@ function renderSchedule(dateStr) {
         title: sess.title,
         coach: sess.coach,
         location: sess.location,
-        gender: sess.gender,
+        // gender removed from detail object
         maxSlots: sess.maxSlots,
         price: sess.price || null
       };

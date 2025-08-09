@@ -16,30 +16,31 @@
       <h1>Profile</h1>
     </header>
     <section class="section">
-      <h2>Your Information</h2>
-      <p>Name: <strong id="profileName">Guest</strong></p>
-      <p>Email: <strong id="profileEmail">—</strong></p>
+      <div class="profile-header">
+        <div class="profile-avatar" id="profileAvatar">A</div>
+        <div class="profile-info">
+          <h3 id="profileName">Guest</h3>
+          <p id="profileEmail">—</p>
+        </div>
+      </div>
     </section>
     <section class="section">
-      <h2>Account</h2>
-      <ul class="booking-list">
-        <li class="booking-item"><a href="edit_profile.html">Edit Profile</a></li>
-        <li class="booking-item"><a href="transactions.html">My Transactions</a></li>
-        <li class="booking-item"><a href="my_packages.html">My Packages</a></li>
-        <li class="booking-item"><a href="bookings.html">My Bookings</a></li>
-        <!-- This link is shown only for admin users via profile.js -->
-        <li class="booking-item" id="adminPanelLink" style="display:none;"><a href="admin_dashboard.html">Admin Dashboard</a></li>
-      </ul>
+      <div class="profile-menu">
+        <a href="edit_profile.html" class="profile-menu-item">Edit Profile<span>›</span></a>
+        <a href="transactions.html" class="profile-menu-item">My Transactions<span>›</span></a>
+        <a href="my_packages.html" class="profile-menu-item">My Packages<span>›</span></a>
+        <a href="bookings.html" class="profile-menu-item">My Bookings<span>›</span></a>
+        <a href="admin_dashboard.html" id="adminPanelLink" class="profile-menu-item" style="display:none;">Admin Dashboard<span>›</span></a>
+      </div>
     </section>
     <section class="section">
-      <h2>Misc</h2>
-      <ul class="booking-list">
-        <li class="booking-item"><a href="about.html">About Us</a></li>
-        <li class="booking-item"><a href="contact.html">Contact Us</a></li>
-      </ul>
+      <div class="profile-menu">
+        <a href="about.html" class="profile-menu-item">About Us<span>›</span></a>
+        <a href="contact.html" class="profile-menu-item">Contact Us<span>›</span></a>
+      </div>
     </section>
     <section class="section">
-      <button id="logoutButton" class="btn" style="background-color:#e57373;color:white;">Log Out</button>
+      <button id="logoutButton" class="btn" style="background-color:#e57373;color:white;width:100%;">Log Out</button>
     </section>
   </div>
   <nav class="bottom-nav">

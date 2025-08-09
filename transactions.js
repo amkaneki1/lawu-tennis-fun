@@ -38,15 +38,48 @@ document.addEventListener('DOMContentLoaded', () => {
       card.innerHTML = `
         <p><strong>ID:</strong> ${tx.id}</p>
         <p><strong>Date:</strong> ${tx.date}</p>
+        <p><strong>User:</strong> ${tx.userEmail || '-'}</p>
         <p><strong>Item:</strong> ${tx.item}</p>
         <p><strong>Status:</strong> ${tx.status}</p>
         <p><strong>Price:</strong> ${tx.price}</p>
       `;
-      const detailLink = document.createElement('a');
-      detailLink.href = 'transaction_detail.html?id=' + encodeURIComponent(tx.id);
-      detailLink.className = 'btn';
-      detailLink.textContent = 'Detail';
-      card.appendChild(detailLink);
+      if (isAdmin) {
+        // Admin actions: approve or reject
+        if (tx.status === 'Pending Payment') {
+          const acceptBtn = document.createElement('button');
+          acceptBtn.className = 'btn';
+          acceptBtn.style.marginRight = '8px';
+          acceptBtn.textContent = 'Mark Paid';
+          acceptBtn.addEventListener('click', () => {
+            markTransactionPaid(tx.id);
+          });
+        const rejectBtn = document.createElement('button');
+        rejectBtn.className = 'btn';
+        rejectBtn.style.backgroundColor = '#e57373';
+        rejectBtn.style.color = 'white';
+        // Rename to Reject for clarity
+        rejectBtn.textContent = 'Reject';
+        rejectBtn.addEventListener('click', () => {
+          deleteTransaction(tx.id);
+        });
+        card.appendChild(acceptBtn);
+        card.appendChild(rejectBtn);
+        } else {
+          // Completed transactions show detail link
+          const detailLink = document.createElement('a');
+          detailLink.href = 'transaction_detail.html?id=' + encodeURIComponent(tx.id);
+          detailLink.className = 'btn';
+          detailLink.textContent = 'Detail';
+          card.appendChild(detailLink);
+        }
+      } else {
+        // Non-admin: show detail link only
+        const detailLink = document.createElement('a');
+        detailLink.href = 'transaction_detail.html?id=' + encodeURIComponent(tx.id);
+        detailLink.className = 'btn';
+        detailLink.textContent = 'Detail';
+        card.appendChild(detailLink);
+      }
       listEl.appendChild(card);
     });
   }
@@ -66,3 +99,38 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial render
   renderTransactions();
 });
+
+// Helper function to mark a transaction as paid/completed
+function markTransactionPaid(id) {
+  let transactions = JSON.parse(localStorage.getItem('lawuTennisTransactions')) || [];
+  const idx = transactions.findIndex(tx => tx.id === id);
+  if (idx !== -1) {
+    transactions[idx].status = 'Paid';
+    localStorage.setItem('lawuTennisTransactions', JSON.stringify(transactions));
+    // Refresh view
+    document.getElementById('pendingTab').click();
+  }
+}
+
+// Helper function to delete a transaction (admin)
+function deleteTransaction(id) {
+  if (!confirm('Delete this transaction? This will remove any associated bookings or packages.')) return;
+  let transactions = JSON.parse(localStorage.getItem('lawuTennisTransactions')) || [];
+  const txIndex = transactions.findIndex(tx => tx.id === id);
+  if (txIndex === -1) return;
+  const tx = transactions[txIndex];
+  // Remove associated booking/package
+  if (tx.type === 'class') {
+    let bookings = JSON.parse(localStorage.getItem('lawuTennisBookings')) || [];
+    bookings = bookings.filter(b => !(b.title === tx.item && b.userEmail === tx.userEmail));
+    localStorage.setItem('lawuTennisBookings', JSON.stringify(bookings));
+  } else if (tx.type === 'package') {
+    let purchased = JSON.parse(localStorage.getItem('lawuTennisPurchasedPackages')) || [];
+    purchased = purchased.filter(p => !(p.name === tx.item && p.userEmail === tx.userEmail));
+    localStorage.setItem('lawuTennisPurchasedPackages', JSON.stringify(purchased));
+  }
+  transactions.splice(txIndex, 1);
+  localStorage.setItem('lawuTennisTransactions', JSON.stringify(transactions));
+  // Refresh view
+  document.getElementById('pendingTab').click();
+}

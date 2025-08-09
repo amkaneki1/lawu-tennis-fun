@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const title = document.getElementById('sessionTitle').value.trim();
     const coach = document.getElementById('sessionCoach').value.trim();
     const location = document.getElementById('sessionLocation').value.trim();
-    const gender = document.getElementById('sessionGender').value;
+    // Gender field removed; default to 'All Gender'
+    const gender = 'All Gender';
     const maxSlots = parseInt(document.getElementById('sessionMaxSlots').value, 10);
     const priceInput = document.getElementById('sessionPrice');
     const price = priceInput.value ? parseInt(priceInput.value, 10) : null;
@@ -87,6 +88,7 @@ function seedDefaultSessions() {
       title: 'Morning Tennis Drills',
       coach: 'Coach Andi',
       location: 'Outdoor Court',
+      // Gender removed – retain legacy value but unused
       gender: 'All Gender',
       maxSlots: 8,
       price: 150000
@@ -135,7 +137,7 @@ function renderSessionsTable() {
       <td style="border:1px solid #ddd;padding:6px;">${session.title}</td>
       <td style="border:1px solid #ddd;padding:6px;">${session.coach}</td>
       <td style="border:1px solid #ddd;padding:6px;">${session.location}</td>
-      <td style="border:1px solid #ddd;padding:6px;">${session.gender}</td>
+      <!-- Gender column removed -->
       <td style="border:1px solid #ddd;padding:6px;">${session.maxSlots}</td>
       <td style="border:1px solid #ddd;padding:6px;">${bookedCount}</td>
       <td style="border:1px solid #ddd;padding:6px;">${priceText}</td>
@@ -166,7 +168,7 @@ function editSession(id) {
   document.getElementById('sessionTitle').value = session.title;
   document.getElementById('sessionCoach').value = session.coach;
   document.getElementById('sessionLocation').value = session.location;
-  document.getElementById('sessionGender').value = session.gender;
+  // Gender field removed; no need to populate
   document.getElementById('sessionMaxSlots').value = session.maxSlots;
   // Change button text
   const form = document.getElementById('addSessionForm');

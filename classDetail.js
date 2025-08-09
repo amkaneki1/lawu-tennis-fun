@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <p><strong>Duration:</strong> ${session.duration} minutes</p>
     <p><strong>Location:</strong> ${session.location}</p>
     <p><strong>Instructor:</strong> ${session.coach}</p>
-    <p><strong>Gender:</strong> ${session.gender || 'All'}</p>
+    <!-- Gender removed per requirements -->
     <p><strong>Price:</strong> ${session.price !== null && session.price !== undefined ? 'Rp ' + numberWithCommas(session.price) : 'Free'}</p>
   `;
   classInfoEl.appendChild(infoList);
