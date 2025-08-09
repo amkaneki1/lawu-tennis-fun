@@ -231,3 +231,42 @@ body {
 .reset-section button:hover {
   background-color: #d32f2f;
 }
+
+/* Generic card lists used on packages and other pages */
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.card-item {
+  background-color: #f8f5ef;
+  border: 1px solid #e0d8ce;
+  border-radius: 6px;
+  padding: 15px;
+}
+.card-item h3 {
+  margin-bottom: 5px;
+  color: #3a614d;
+  font-weight: 600;
+}
+.card-item p {
+  color: #666;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+}
+
+/* Booking list styles for bookings page */
+.booking-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.booking-item {
+  background-color: #f8f5ef;
+  border: 1px solid #e0d8ce;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: #3a614d;
+}
