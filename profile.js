@@ -10,6 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
   nameEl.textContent = profileData.fullName || currentUser;
   emailEl.textContent = profileData.email || currentUser;
 
+  // Show admin dashboard link if this user is an admin
+  if (profileData.isAdmin) {
+    const adminLinkItem = document.getElementById('adminPanelLink');
+    if (adminLinkItem) {
+      adminLinkItem.style.display = 'list-item';
+    }
+  }
+
   const logoutBtn = document.getElementById('logoutButton');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {

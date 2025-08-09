@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedule Management – Lawu Tennis Fun</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="beige-bg">
+  <div class="main-card">
+    <header class="inner-header">
+      <a href="admin_dashboard.html" class="back-link">← Back</a>
+      <h1>Schedule Management</h1>
+    </header>
+    <section class="section">
+      <h2>Add New Session</h2>
+      <form id="addSessionForm" class="auth-form" style="margin-bottom:20px;">
+        <label for="sessionDate">Date</label>
+        <input type="date" id="sessionDate" required />
+        <label for="sessionTime">Time</label>
+        <input type="time" id="sessionTime" required />
+        <label for="sessionDuration">Duration (minutes)</label>
+        <input type="number" id="sessionDuration" min="30" step="15" required />
+        <label for="sessionTitle">Title</label>
+        <input type="text" id="sessionTitle" required />
+        <label for="sessionCoach">Coach</label>
+        <input type="text" id="sessionCoach" required />
+        <label for="sessionLocation">Location</label>
+        <input type="text" id="sessionLocation" required />
+        <label for="sessionGender">Gender</label>
+        <select id="sessionGender" required>
+          <option value="All Gender">All Gender</option>
+          <option value="Girls Only">Girls Only</option>
+        </select>
+        <label for="sessionMaxSlots">Max Slots</label>
+        <input type="number" id="sessionMaxSlots" min="1" value="8" required />
+        <label for="sessionPrice">Price (optional)</label>
+        <input type="number" id="sessionPrice" min="0" step="10000" placeholder="Price in IDR" />
+        <button type="submit" class="btn" style="width:100%;margin-top:12px;">Add Session</button>
+      </form>
+    </section>
+    <section class="section">
+      <h2>Existing Sessions</h2>
+      <div style="overflow-x:auto;">
+        <table id="sessionsTable" style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th style="border:1px solid #ddd;padding:6px;">Date</th>
+              <th style="border:1px solid #ddd;padding:6px;">Time</th>
+              <th style="border:1px solid #ddd;padding:6px;">Duration</th>
+              <th style="border:1px solid #ddd;padding:6px;">Title</th>
+              <th style="border:1px solid #ddd;padding:6px;">Coach</th>
+              <th style="border:1px solid #ddd;padding:6px;">Location</th>
+              <th style="border:1px solid #ddd;padding:6px;">Gender</th>
+              <th style="border:1px solid #ddd;padding:6px;">Max Slots</th>
+              <th style="border:1px solid #ddd;padding:6px;">Booked</th>
+              <th style="border:1px solid #ddd;padding:6px;">Price</th>
+              <th style="border:1px solid #ddd;padding:6px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="sessionsBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+  <script src="auth.js"></script>
+  <script src="admin_schedule.js"></script>
+</body>
+</html>

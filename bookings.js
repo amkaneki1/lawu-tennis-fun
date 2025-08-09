@@ -5,21 +5,33 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!currentUser) return;
   const bookingsList = document.getElementById('bookingsList');
   if (!bookingsList) return;
-  // Retrieve stored bookings from localStorage; keys are dates and values are arrays of session objects
-  const stored = JSON.parse(localStorage.getItem('lawuTennisBookings')) || {};
-  const items = [];
-  // Flatten the booking data into an array of objects for sorting and display.
-  Object.keys(stored).forEach(date => {
-    (stored[date] || []).forEach(session => {
-      if (typeof session === 'string') {
-        // For legacy entries, assume they belong to current user
-        items.push({ date, time: session, title: '' });
-      } else {
-        if (!session.userEmail || session.userEmail === currentUser) {
-          items.push({ date, time: session.time, title: session.title || '' });
+  // Retrieve stored bookings from localStorage. We support two formats:
+  // (1) New format: an array of booking objects { sessionId, date, time, title, userEmail }
+  // (2) Legacy format: an object keyed by date -> array of session info
+  const rawBookings = JSON.parse(localStorage.getItem('lawuTennisBookings')) || [];
+  let bookingsArr = [];
+  if (Array.isArray(rawBookings)) {
+    bookingsArr = rawBookings;
+  } else {
+    // Convert legacy format to array
+    Object.keys(rawBookings).forEach(date => {
+      (rawBookings[date] || []).forEach(session => {
+        if (typeof session === 'string') {
+          // Strings represent time only; assume belongs to current user and unknown title
+          bookingsArr.push({ date, time: session, title: '', userEmail: currentUser });
+        } else {
+          bookingsArr.push({ date, time: session.time, title: session.title || '', userEmail: session.userEmail || currentUser });
         }
-      }
+      });
     });
+    // Save back in new format for future ease
+    localStorage.setItem('lawuTennisBookings', JSON.stringify(bookingsArr));
+  }
+  const items = [];
+  bookingsArr.forEach(b => {
+    if (!b.userEmail || b.userEmail === currentUser) {
+      items.push({ date: b.date, time: b.time, title: b.title || '' });
+    }
   });
   // If no bookings exist, show a friendly message.
   if (items.length === 0) {

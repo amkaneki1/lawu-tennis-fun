@@ -25,25 +25,20 @@ document.addEventListener('DOMContentLoaded', () => {
   infoList.innerHTML = `
     <p><strong>Date:</strong> ${session.date}</p>
     <p><strong>Time:</strong> ${session.time}</p>
-    <p><strong>Duration:</strong> ${session.duration}</p>
+    <p><strong>Duration:</strong> ${session.duration} minutes</p>
     <p><strong>Location:</strong> ${session.location}</p>
-    <p><strong>Instructor:</strong> ${session.instructor}</p>
-    <p><strong>Price:</strong> ${session.price}</p>
-    <p><strong>Description:</strong> ${session.description || 'No description provided.'}</p>
+    <p><strong>Instructor:</strong> ${session.coach}</p>
+    <p><strong>Gender:</strong> ${session.gender || 'All'}</p>
+    <p><strong>Price:</strong> ${session.price !== null && session.price !== undefined ? 'Rp ' + numberWithCommas(session.price) : 'Free'}</p>
   `;
   classInfoEl.appendChild(infoList);
 
-  // Determine booking status from localStorage for current user
-  const bookingsData = JSON.parse(localStorage.getItem('lawuTennisBookings')) || {};
-  let isBooked = false;
-  if (bookingsData[session.date]) {
-    isBooked = bookingsData[session.date].some(b => {
-      if (typeof b === 'string') {
-        return b === session.time && !currentUser;
-      }
-      return b.time === session.time && b.title === session.title && (b.userEmail ? b.userEmail === currentUser : true);
-    });
-  }
+  // Determine booking status and full status from localStorage
+  const bookings = JSON.parse(localStorage.getItem('lawuTennisBookings')) || [];
+  const sessionBookings = bookings.filter(b => b.sessionId === session.id);
+  const isBooked = sessionBookings.some(b => b.userEmail === currentUser);
+  const maxSlots = session.maxSlots;
+  const isFull = maxSlots !== undefined && sessionBookings.length >= maxSlots;
 
   // Input for promo code
   const promoContainer = document.createElement('div');
@@ -66,13 +61,16 @@ document.addEventListener('DOMContentLoaded', () => {
   promoContainer.appendChild(promoCheckBtn);
   classActionsEl.appendChild(promoContainer);
 
-  // Button to perform booking or waiting list
+  // Button to perform booking
   const actionBtn = document.createElement('button');
   actionBtn.className = 'btn';
   let actionText = '';
   if (isBooked) {
     actionBtn.disabled = true;
     actionText = 'Booked';
+  } else if (isFull) {
+    actionBtn.disabled = true;
+    actionText = 'Full';
   } else {
     actionText = 'Checkout';
   }
@@ -81,14 +79,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // If not booked, perform booking and create transaction, then redirect
     if (!isBooked) {
       // Add booking for current user
-      const date = session.date;
-      const bookingObj = { time: session.time, title: session.title, userEmail: currentUser };
-      const data = JSON.parse(localStorage.getItem('lawuTennisBookings')) || {};
-      if (!data[date]) data[date] = [];
-      // Avoid duplicates for this user
-      if (!data[date].some(b => b.time === bookingObj.time && b.title === bookingObj.title && (b.userEmail ? b.userEmail === currentUser : true))) {
-        data[date].push(bookingObj);
-        localStorage.setItem('lawuTennisBookings', JSON.stringify(data));
+      // Ensure bookings is an array (migrated from earlier object format)
+      let bookingsArr = JSON.parse(localStorage.getItem('lawuTennisBookings')) || [];
+      // Avoid duplicate booking
+      if (!bookingsArr.some(b => b.sessionId === session.id && b.userEmail === currentUser)) {
+        bookingsArr.push({
+          sessionId: session.id,
+          date: session.date,
+          time: session.time,
+          title: session.title,
+          userEmail: currentUser
+        });
+        localStorage.setItem('lawuTennisBookings', JSON.stringify(bookingsArr));
       }
       // Create a transaction for this booking for current user
       const transactions = JSON.parse(localStorage.getItem('lawuTennisTransactions')) || [];
@@ -111,4 +113,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   classActionsEl.appendChild(actionBtn);
+
+  // Helper to format price
+  function numberWithCommas(x) {
+    if (x === null || x === undefined) return '';
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
 });

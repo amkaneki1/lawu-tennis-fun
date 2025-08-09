@@ -13,12 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault();
     const name = document.getElementById('signupName').value.trim();
     const email = document.getElementById('signupEmail').value.trim();
+    const phone = document.getElementById('signupPhone').value.trim();
     const password = document.getElementById('signupPassword').value;
-    if (!name || !email || !password) {
+    if (!name || !email || !phone || !password) {
       alert('Please complete all fields.');
       return;
     }
-    const err = registerUser(email, password, { fullName: name });
+    // When registering a user, pass phone number along with full name
+    const err = registerUser(email, password, { fullName: name, phone });
     if (err) {
       alert(err);
       return;

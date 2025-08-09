@@ -11,67 +11,43 @@ function formatDate(date) {
   return `${year}-${month}-${day}`;
 }
 
-// Generate sample sessions for demonstration purposes. In a real application this
-// data would come from a server.
+// Load sessions from localStorage and filter them by date. If no session data
+// exists, returns an empty array. Sessions are objects with an id, date,
+// time, duration (minutes), title, coach, location, gender, and maxSlots.
 function getSessionsForDate(dateStr) {
-  // We'll return the same sessions regardless of date for simplicity.
-  return [
-    {
-      time: '07:00 - 08:00',
-      duration: '1h',
+  let allSessions = JSON.parse(localStorage.getItem('lawuTennisSessions')) || [];
+  // If there are no sessions defined, seed with two default sessions for today
+  if (allSessions.length === 0) {
+    const defaultSessions = [];
+    // Create two sample sessions for the requested date
+    defaultSessions.push({
+      id: 'session-' + Date.now(),
+      date: dateStr,
+      time: '07:00',
+      duration: 60,
       title: 'Morning Tennis Drills',
       coach: 'Coach Andi',
-      instructor: 'Coach Andi',
       location: 'Court 1',
-      spots: 4,
-      price: 'Rp 150.000',
-      description: 'Start your day with energizing drills focusing on footwork and consistency.'
-    },
-    {
-      time: '09:00 - 10:30',
-      duration: '1.5h',
-      title: 'Doubles Practice',
-      coach: 'Coach Budi',
-      instructor: 'Coach Budi',
-      location: 'Court 2',
-      spots: 0,
-      price: 'Rp 200.000',
-      description: 'Sharpen your teamwork and court strategies in this doubles-focused session.'
-    },
-    {
-      time: '11:00 - 12:00',
-      duration: '1h',
+      gender: 'All Gender',
+      maxSlots: 8,
+      price: 150000
+    });
+    defaultSessions.push({
+      id: 'session-' + (Date.now() + 1),
+      date: dateStr,
+      time: '09:00',
+      duration: 60,
       title: 'Serve & Return Workshop',
-      coach: 'Coach Citra',
-      instructor: 'Coach Citra',
-      location: 'Court 3',
-      spots: 2,
-      price: 'Rp 180.000',
-      description: 'Improve your serve accuracy and perfect your returns with targeted drills.'
-    },
-    {
-      time: '14:00 - 15:30',
-      duration: '1.5h',
-      title: 'Singles Strategy',
-      coach: 'Coach Dani',
-      instructor: 'Coach Dani',
-      location: 'Court 1',
-      spots: 0,
-      price: 'Rp 200.000',
-      description: 'Learn tactics and positioning to outsmart your opponent in singles play.'
-    },
-    {
-      time: '16:00 - 17:00',
-      duration: '1h',
-      title: 'Junior Tennis Fun',
-      coach: 'Coach Eka',
-      instructor: 'Coach Eka',
+      coach: 'Coach Siti',
       location: 'Court 2',
-      spots: 3,
-      price: 'Rp 120.000',
-      description: 'A fun, engaging class for young players to learn the basics of tennis.'
-    }
-  ];
+      gender: 'All Gender',
+      maxSlots: 8,
+      price: 150000
+    });
+    allSessions = defaultSessions;
+    localStorage.setItem('lawuTennisSessions', JSON.stringify(allSessions));
+  }
+  return allSessions.filter(sess => sess.date === dateStr);
 }
 
 function renderSchedule(dateStr) {
@@ -79,28 +55,30 @@ function renderSchedule(dateStr) {
   const sessions = getSessionsForDate(dateStr);
   let html = `<h2>Classes on ${dateStr}</h2>`;
   html += '<div class="session-list">';
-  // Retrieve existing bookings to determine initial button states
-  const bookingsData = JSON.parse(localStorage.getItem('lawuTennisBookings')) || {};
+  // Load all bookings to determine if the user has already booked a session and to calculate spots left
+  const bookings = JSON.parse(localStorage.getItem('lawuTennisBookings')) || [];
   const currentUser = localStorage.getItem('lawuTennisCurrentUser');
   sessions.forEach((sess, index) => {
-    // Determine if the current user has already booked this session on this date
-    const dateBookings = bookingsData[dateStr] || [];
-    const isBooked = dateBookings.some(item => {
-      // Support older objects without userEmail property by assuming they belong to current user
-      if (typeof item === 'string') {
-        return item === sess.time && !currentUser; // Should not happen
-      }
-      return item.time === sess.time && item.title === sess.title && (item.userEmail ? item.userEmail === currentUser : true);
-    });
-    // Regardless of the number of spots, from customer perspective all sessions are available to book
-    const spotsLabel = 'Available';
-    let buttonHTML = '';
-    if (isBooked) {
-      buttonHTML = `<button class="btn detail-btn" data-index="${index}" disabled>Booked</button>`;
+    // Determine booked count and whether current user already booked this session
+    const sessionBookings = bookings.filter(b => b.sessionId === sess.id);
+    const bookedCount = sessionBookings.length;
+    const isFull = sess.maxSlots !== undefined && bookedCount >= sess.maxSlots;
+    const userHasBooked = sessionBookings.some(b => b.userEmail === currentUser);
+    let spotsLabel = '';
+    if (isFull) {
+      spotsLabel = 'Full';
     } else {
-      buttonHTML = `<button class="btn detail-btn" data-index="${index}">Book</button>`;
+      spotsLabel = 'Available';
     }
-    html += `<div class="session-item" data-index="${index}">
+    let buttonHTML = '';
+    if (userHasBooked) {
+      buttonHTML = `<button class="btn detail-btn" data-id="${sess.id}" disabled>Booked</button>`;
+    } else if (isFull) {
+      buttonHTML = `<button class="btn detail-btn" data-id="${sess.id}" disabled>Full</button>`;
+    } else {
+      buttonHTML = `<button class="btn detail-btn" data-id="${sess.id}">Book</button>`;
+    }
+    html += `<div class="session-item" data-id="${sess.id}">
         <div class="session-time">${sess.time}</div>
         <div class="session-details">
           <h3>${sess.title}</h3>
@@ -117,19 +95,21 @@ function renderSchedule(dateStr) {
   // Attach listeners for detail buttons
   container.querySelectorAll('.detail-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const idx = btn.getAttribute('data-index');
-      const sess = sessions[idx];
-      // Build session object for class detail page
+      const sessionId = btn.getAttribute('data-id');
+      const sess = sessions.find(s => s.id === sessionId);
+      if (!sess) return;
+      // Build session object for class detail page and store in sessionStorage
       const detailObj = {
-        date: dateStr,
+        id: sess.id,
+        date: sess.date,
         time: sess.time,
-        duration: sess.duration || '',
+        duration: sess.duration,
         title: sess.title,
-        instructor: sess.coach,
+        coach: sess.coach,
         location: sess.location,
-        spots: sess.spots,
-        price: sess.price || 'Free',
-        description: sess.description || ''
+        gender: sess.gender,
+        maxSlots: sess.maxSlots,
+        price: sess.price || null
       };
       sessionStorage.setItem('selectedClass', JSON.stringify(detailObj));
       window.location.href = 'class_detail.html';

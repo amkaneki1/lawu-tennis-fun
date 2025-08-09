@@ -30,6 +30,7 @@ function registerUser(email, password, profileData = {}) {
   if (users.some(u => u.email === email)) {
     return 'An account with this email already exists.';
   }
+  // Add the new user. Store only email and password here; admin flag is stored on the profile.
   users.push({ email, password });
   localStorage.setItem('lawuTennisUsers', JSON.stringify(users));
   // Save profile data for this user
@@ -41,7 +42,9 @@ function registerUser(email, password, profileData = {}) {
     instagram: profileData.instagram || '',
     birthDate: profileData.birthDate || '',
     gender: profileData.gender || '',
-    notes: profileData.notes || ''
+    notes: profileData.notes || '',
+    // isAdmin flag allows certain accounts to access admin features
+    isAdmin: !!profileData.isAdmin
   };
   localStorage.setItem('lawuTennisProfiles', JSON.stringify(existingProfiles));
   return null;
@@ -94,3 +97,58 @@ function resetPassword(email, newPassword) {
   localStorage.setItem('lawuTennisUsers', JSON.stringify(users));
   return null;
 }
+
+/**
+ * Ensures the current user has admin privileges. If not, redirects to the home
+ * page. Returns the email of the current user if they are an admin; otherwise
+ * null.
+ */
+function requireAdmin() {
+  const currentUser = requireLogin();
+  if (!currentUser) {
+    return null;
+  }
+  const profiles = JSON.parse(localStorage.getItem('lawuTennisProfiles')) || {};
+  const profile = profiles[currentUser];
+  if (!profile || !profile.isAdmin) {
+    // Not an admin – redirect to home page
+    window.location.href = 'index.html';
+    return null;
+  }
+  return currentUser;
+}
+
+/*
+ * Seed the built‑in admin account if it does not already exist. This code runs
+ * immediately when this file is loaded. The admin credentials are defined
+ * inline for demonstration purposes: user = dhuha@gmail.com, password = dhuha.
+ */
+(function seedAdminAccount() {
+  const adminEmail = 'dhuha@gmail.com';
+  const adminPassword = 'dhuha';
+  // Load existing users and profiles
+  const users = JSON.parse(localStorage.getItem('lawuTennisUsers')) || [];
+  const profiles = JSON.parse(localStorage.getItem('lawuTennisProfiles')) || {};
+  const hasAdminUser = users.some(u => u.email === adminEmail);
+  if (!hasAdminUser) {
+    // Add to users list
+    users.push({ email: adminEmail, password: adminPassword });
+    localStorage.setItem('lawuTennisUsers', JSON.stringify(users));
+  }
+  // Ensure admin profile exists and has isAdmin flag
+  if (!profiles[adminEmail]) {
+    profiles[adminEmail] = {
+      email: adminEmail,
+      fullName: 'Admin',
+      phone: '',
+      instagram: '',
+      birthDate: '',
+      gender: '',
+      notes: '',
+      isAdmin: true
+    };
+  } else {
+    profiles[adminEmail].isAdmin = true;
+  }
+  localStorage.setItem('lawuTennisProfiles', JSON.stringify(profiles));
+})();

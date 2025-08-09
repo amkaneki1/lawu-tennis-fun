@@ -13,8 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
     listEl.innerHTML = '';
     const transactions = JSON.parse(localStorage.getItem('lawuTennisTransactions')) || [];
     // Filter by status and by user
+    // Determine if current user is admin
+    const profiles = JSON.parse(localStorage.getItem('lawuTennisProfiles')) || {};
+    const profile = profiles[currentUser] || {};
+    const isAdmin = !!profile.isAdmin;
     const filtered = transactions.filter(tx => {
-      if (tx.userEmail && tx.userEmail !== currentUser) {
+      // If not admin, show only transactions belonging to current user
+      if (!isAdmin && tx.userEmail && tx.userEmail !== currentUser) {
         return false;
       }
       if (currentTab === 'Pending') return tx.status === 'Pending Payment';

@@ -6,20 +6,28 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!currentUser) return;
   const bookingsSummaryEl = document.getElementById('bookingsSummary');
   const promosSummaryEl = document.getElementById('promosSummary');
-  // Retrieve bookings from localStorage; stored as an object keyed by date with array of session objects
-  const bookingsData = JSON.parse(localStorage.getItem('lawuTennisBookings')) || {};
-  let bookingCount = 0;
-  Object.keys(bookingsData).forEach(date => {
-    const arr = bookingsData[date];
-    if (Array.isArray(arr)) {
-      arr.forEach(item => {
+  // Retrieve bookings from localStorage; supports both array and legacy object formats.
+  const rawBookings = JSON.parse(localStorage.getItem('lawuTennisBookings')) || [];
+  let bookingsArr;
+  if (Array.isArray(rawBookings)) {
+    bookingsArr = rawBookings;
+  } else {
+    // Convert legacy to array
+    bookingsArr = [];
+    Object.keys(rawBookings).forEach(date => {
+      (rawBookings[date] || []).forEach(item => {
         if (typeof item === 'string') {
-          bookingCount++;
+          bookingsArr.push({ date, time: item, userEmail: currentUser });
         } else {
-          if (!item.userEmail || item.userEmail === currentUser) bookingCount++;
+          bookingsArr.push({ date, time: item.time, userEmail: item.userEmail || currentUser });
         }
       });
-    }
+    });
+    localStorage.setItem('lawuTennisBookings', JSON.stringify(bookingsArr));
+  }
+  let bookingCount = 0;
+  bookingsArr.forEach(b => {
+    if (!b.userEmail || b.userEmail === currentUser) bookingCount++;
   });
   if (bookingCount > 0) {
     bookingsSummaryEl.textContent = `You have ${bookingCount} upcoming booking${bookingCount > 1 ? 's' : ''}.`;
